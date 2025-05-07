@@ -77,9 +77,9 @@ public:
         return Bounds3(Vector3f(center.x-radius, center.y-radius, center.z-radius),
                        Vector3f(center.x+radius, center.y+radius, center.z+radius));
     }
-    void Sample(Intersection &pos, float &pdf){
+    void Sample(Intersection &pos, float &pdf){ // randomly select a point on sphere surface???
         float theta = 2.0 * M_PI * get_random_float(), phi = M_PI * get_random_float();
-        Vector3f dir(std::cos(phi), std::sin(phi)*std::cos(theta), std::sin(phi)*std::sin(theta));
+        Vector3f dir(std::cos(phi), std::sin(phi)*std::cos(theta), std::sin(phi)*std::sin(theta)); //?let vertical is x
         pos.coords = center + radius * dir;
         pos.normal = dir;
         pos.emit = m->getEmission();

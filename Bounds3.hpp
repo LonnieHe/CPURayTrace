@@ -96,7 +96,31 @@ inline bool Bounds3::IntersectP(const Ray& ray, const Vector3f& invDir,
     // invDir: ray direction(x,y,z), invDir=(1.0/x,1.0/y,1.0/z), use this because Multiply is faster that Division
     // dirIsNeg: ray direction(x,y,z), dirIsNeg=[int(x>0),int(y>0),int(z>0)], use this to simplify your logic
     // TODO test if ray bound intersects
+    double tx_0 = (pMin.x - ray.origin.x) * invDir.x;
+    double tx_1 = (pMax.x - ray.origin.x) * invDir.x;
+    double ty_0 = (pMin.y - ray.origin.y) * invDir.y;
+    double ty_1 = (pMax.y - ray.origin.y) * invDir.y;
+    double tz_0 = (pMin.z - ray.origin.z) * invDir.z;
+    double tz_1 = (pMax.z - ray.origin.z) * invDir.z;
 
+    // order the slabs time
+    if(!dirIsNeg[0]){
+        std::swap(tx_0, tx_1);
+    }
+    if(!dirIsNeg[1]){
+        std::swap(ty_0, ty_1);
+    }
+    if(!dirIsNeg[2]){
+        std::swap(tz_0, tz_1);
+    }
+    // calculate the intersection time
+    double t0 = std::max(tx_0, std::max(ty_0, tz_0));
+    double t1 = std::min(tx_1, std::min(ty_1, tz_1));
+
+    if(t0 < t1 && t0 >= 0){
+        return true;
+    }
+    return false;
 }
 
 inline Bounds3 Union(const Bounds3& b1, const Bounds3& b2)
