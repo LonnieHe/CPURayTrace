@@ -77,6 +77,7 @@ public:
         pos.coords = v0 * (1.0f - x) + v1 * (x * (1.0f - y)) + v2 * (x * y);
         pos.normal = this->normal;
         pdf = 1.0f / area;
+        // std::cout << pdf << std::endl;
     }
     float getArea(){
         return area;
@@ -257,9 +258,9 @@ inline Intersection Triangle::getIntersection(Ray ray)
     inter.happened = true;
     inter.coords = ray(t_tmp);
     inter.normal = normal;
-    inter.m = this->m;
+    inter.m = m;
     inter.obj = this;
-    inter.distance = t_tmp;//???
+    inter.distance = t_tmp;// time of intersection, BVH will select earlier?
     return inter;
 }
 

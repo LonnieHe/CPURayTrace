@@ -103,21 +103,22 @@ inline bool Bounds3::IntersectP(const Ray& ray, const Vector3f& invDir,
     double tz_0 = (pMin.z - ray.origin.z) * invDir.z;
     double tz_1 = (pMax.z - ray.origin.z) * invDir.z;
 
+    // std::cout << dirIsNeg[0] << " " << dirIsNeg[1] << " " << dirIsNeg[2] << std::endl;
     // order the slabs time
-    if(!dirIsNeg[0]){
+    if(dirIsNeg[0] == 0){
         std::swap(tx_0, tx_1);
     }
-    if(!dirIsNeg[1]){
+    if(dirIsNeg[1] == 0){
         std::swap(ty_0, ty_1);
     }
-    if(!dirIsNeg[2]){
+    if(dirIsNeg[2] == 0){
         std::swap(tz_0, tz_1);
     }
     // calculate the intersection time
     double t0 = std::max(tx_0, std::max(ty_0, tz_0));
     double t1 = std::min(tx_1, std::min(ty_1, tz_1));
 
-    if(t0 < t1 && t0 >= 0){
+    if(t0 < t1 && t1 > 0){
         return true;
     }
     return false;

@@ -135,9 +135,9 @@ Vector3f Material::sample(const Vector3f &wi, const Vector3f &N){
         {
             // uniform sample on the hemisphere
             float x_1 = get_random_float(), x_2 = get_random_float();
-            float z = std::fabs(1.0f - 2.0f * x_1);
-            float r = std::sqrt(1.0f - z * z), phi = 2 * M_PI * x_2;
-            Vector3f localRay(r*std::cos(phi), r*std::sin(phi), z);
+            float z = std::fabs(1.0f - 2.0f * x_1); // random Z 0-1
+            float r = std::sqrt(1.0f - z * z), phi = 2 * M_PI * x_2;// x^2 + y^2 + z^2 = 1;
+            Vector3f localRay(r*std::cos(phi), r*std::sin(phi), z);// random dir and z > 0
             return toWorld(localRay, N);
             
             break;
