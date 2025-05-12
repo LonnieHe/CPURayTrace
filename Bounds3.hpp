@@ -118,7 +118,7 @@ inline bool Bounds3::IntersectP(const Ray& ray, const Vector3f& invDir,
     double t0 = std::max(tx_0, std::max(ty_0, tz_0));
     double t1 = std::min(tx_1, std::min(ty_1, tz_1));
 
-    if(t0 < t1 && t1 > 0){
+    if(t0 <= t1 && t1 > 0){
         return true;
     }
     return false;
