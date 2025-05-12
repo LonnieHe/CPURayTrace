@@ -61,6 +61,7 @@ bool Scene::trace(
 // Implementation of Path Tracing
 Vector3f Scene::castRay(const Ray &ray, int depth) const
 {
+    const float EPS = 1e-4;
     // TO DO Implement Path Tracing Algorithm here
     Vector3f L_dir, L_indir;
     Intersection inter = intersect(ray);
@@ -69,27 +70,27 @@ Vector3f Scene::castRay(const Ray &ray, int depth) const
     if(inter.happened){
         Vector3f N = inter.normal, p = inter.coords;
 
+        Vector3f wo = ray.direction,  origin = p + N * EPS;
         // sample on light
         Intersection inter_light;
         float pdf_light = 0.0;
-        sampleLight(inter_light, pdf_light);
+        if(inter.obj->hasEmit() && depth == 0){   // hit light source
+            L_dir += (8.0f * Vector3f(0.747f+0.058f, 0.747f+0.258f, 0.747f) + 15.6f * Vector3f(0.740f+0.287f,0.740f+0.160f,0.740f) + 18.4f *Vector3f(0.737f+0.642f,0.737f+0.159f,0.737f));
+        }else { // sample direct light
+            sampleLight(inter_light, pdf_light);
 
-        Vector3f x = inter_light.coords;
-        Vector3f NN = inter_light.normal;
+            Vector3f x = inter_light.coords;
+            Vector3f NN = inter_light.normal;
+            Ray r_to_light(origin,(x-origin).normalized());
 
-        const float EPS = 1e-4;
-        Vector3f origin = p + N * EPS;
-        Ray r_to_light(origin,(x-origin).normalized());
+            Intersection inter_test = intersect(r_to_light);    // check if light be blocked。。。也许认为灯没有碰撞体积？
+            Vector3f ws = -r_to_light.direction;    // light to p
 
-        Intersection inter_test = intersect(r_to_light);    // check if light be blocked。。。也许认为灯没有碰撞体积？
-        Vector3f ws = -r_to_light.direction;    // light to p
-        Vector3f wo = ray.direction;    // other to p
-
-        // 找到灯 && （没阻碍 || 碰撞灯） （这个假设是灯本身不触发bvh碰撞）
-        if( ( pdf_light > 0 ) && ((!inter_test.happened) || ((inter_test.coords - inter_light.coords).norm() < 0.001))){ // not blocked
-            float cos_phi = dotProduct(-ws, N);
-            float cos_phi2 = dotProduct(ws, NN);
-            L_dir = inter_light.emit * inter.m->eval(-ws,-wo,N) * cos_phi * cos_phi2 / pow((x - p).norm(),2.0) / pdf_light;
+            if( ( pdf_light > 0 ) && ((!inter_test.happened) || ((inter_test.coords - inter_light.coords).norm() < 0.001))){
+                float cos_phi = dotProduct(-ws, N);
+                float cos_phi2 = dotProduct(ws, NN);
+                L_dir = inter_light.emit * inter.m->eval(-ws,-wo,N) * cos_phi * cos_phi2 / pow((x - p).norm(),2.0) / pdf_light;
+            }
         }
 
         if(get_random_float() <= RussianRoulette){ // RR_success
